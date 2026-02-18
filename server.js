@@ -9,8 +9,13 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(express.json());
-app.use(cors());
+app.disable('x-powered-by');
+app.set('trust proxy', 1);
+const JSON_LIMIT = process.env.JSON_LIMIT || '100kb';
+app.use(express.json({ limit: JSON_LIMIT }));
+const ALLOWED_ORIGIN = process.env.CORS_ORIGIN;
+const corsOptions = ALLOWED_ORIGIN ? { origin: ALLOWED_ORIGIN } : { origin: true };
+app.use(cors(corsOptions));
 app.use(helmet({
     contentSecurityPolicy: false,
 }));
@@ -29,6 +34,14 @@ const connOptions = {
 if (DB_USER && DB_PASS) {
     connOptions.user = DB_USER;
     connOptions.pass = DB_PASS;
+}
+
+if (process.env.NODE_ENV === 'production' && !process.env.MONGODB_URI) {
+    console.error('Missing MONGODB_URI in production. Refusing to start.');
+    process.exit(1);
+}
+if (process.env.NODE_ENV === 'production') {
+    mongoose.set('autoIndex', false);
 }
 
 mongoose.connect(MONGODB_URI, connOptions)
@@ -286,6 +299,15 @@ app.post('/api/game/bet', async (req, res) => {
         }
         if (!MODES[mode]) return res.status(400).json({ error: 'Invalid mode' });
         if (amount < 10) return res.status(400).json({ error: 'Minimum bet is 10' });
+        // Strict bet validation
+        const validColor = ['green', 'red', 'violet'];
+        const isValid =
+            (betType === 'color' && validColor.includes(String(betValue))) ||
+            (betType === 'number' && /^[0-9]$/.test(String(betValue))) ||
+            (betType === 'size' && ['big', 'small'].includes(String(betValue)));
+        if (!isValid) {
+            return res.status(400).json({ error: 'Invalid bet value for bet type' });
+        }
 
         // Find active round
         const round = await Round.findOne({ mode }).sort({ startTime: -1 });
