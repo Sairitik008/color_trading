@@ -19,6 +19,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Database Connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://Sairam:Batman%400712@atlascluster.4jamwll.mongodb.net/chromex?retryWrites=true&w=majority&appName=Cluster0';
 
+// Encode password properly if it contains special characters
+// But since the provided string is already encoded (%40), we should trust the ENV VAR first.
+// The issue might be that Render injects the ENV VAR literally, so we should ensure we use it.
+
 mongoose.connect(MONGODB_URI, {
     serverSelectionTimeoutMS: 5000,
     socketTimeoutMS: 45000,
