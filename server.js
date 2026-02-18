@@ -22,6 +22,26 @@ app.use(helmet({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Simple in-memory rate limiter for API endpoints
+const RATE_WINDOW_MS = parseInt(process.env.RATE_WINDOW_MS || '60000', 10);
+const RATE_MAX = parseInt(process.env.RATE_MAX || '120', 10);
+const rateBuckets = new Map();
+function rateLimit(req, res, next) {
+    const now = Date.now();
+    const ip = req.ip || req.connection?.remoteAddress || 'unknown';
+    let bucket = rateBuckets.get(ip);
+    if (!bucket || now - bucket.start > RATE_WINDOW_MS) {
+        bucket = { start: now, count: 0 };
+    }
+    bucket.count += 1;
+    rateBuckets.set(ip, bucket);
+    if (bucket.count > RATE_MAX) {
+        return res.status(429).json({ error: 'Too Many Requests' });
+    }
+    next();
+}
+app.use('/api', rateLimit);
+
 // Database Connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/chromex';
 
@@ -47,7 +67,7 @@ if (process.env.NODE_ENV === 'production') {
 
 mongoose.connect(MONGODB_URI, connOptions)
     .then(() => {
-        console.log('MongoDB Connected');
+        if (process.env.NODE_ENV !== 'production') console.log('MongoDB Connected');
         startGameLoop();
     })
     .catch(err => {
@@ -165,7 +185,9 @@ async function createNewRound(mode) {
             status: 'open'
         });
         await round.save();
-        console.log(`[${mode}] New Round ${period} started. Ends: ${endTime.toLocaleTimeString()}`);
+        if (process.env.NODE_ENV !== 'production') {
+            console.log(`[${mode}] New Round ${period} started. Ends: ${endTime.toLocaleTimeString()}`);
+        }
     } catch (err) {
         console.error(`[${mode}] Error creating round:`, err.message);
     }
@@ -185,7 +207,9 @@ async function settleRound(round) {
     round.status = 'settled';
     await round.save();
 
-    console.log(`[${round.mode}] Round ${round.period} settled: ${number} (${color}, ${size})`);
+    if (process.env.NODE_ENV !== 'production') {
+        console.log(`[${round.mode}] Round ${round.period} settled: ${number} (${color}, ${size})`);
+    }
 
     // Create next round immediately
     await createNewRound(round.mode);
