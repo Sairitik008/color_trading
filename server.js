@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const path = require('path');
-const { randomInt } = require('crypto');
+const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -90,6 +90,8 @@ const RoundSchema = new mongoose.Schema({
     startTime: { type: Date, required: true },
     endTime: { type: Date, required: true },
     status: { type: String, enum: ['open', 'locked', 'settled'], default: 'open' },
+    commitHash: { type: String, required: true },
+    seed: { type: String, required: true },
     result: {
         number: Number,
         color: String,
@@ -177,12 +179,17 @@ async function createNewRound(mode) {
             return;
         }
 
+        const seed = crypto.randomBytes(32).toString('hex');
+        const commitHash = crypto.createHash('sha256').update(seed + period).digest('hex');
+
         const round = new Round({
             mode,
             period,
             startTime: nextStart,
             endTime,
-            status: 'open'
+            status: 'open',
+            commitHash,
+            seed
         });
         await round.save();
         if (process.env.NODE_ENV !== 'production') {
@@ -194,7 +201,8 @@ async function createNewRound(mode) {
 }
 
 async function settleRound(round) {
-    const number = randomInt(0, 10);
+    const hash = crypto.createHash('sha256').update(round.seed + round.period).digest('hex');
+    const number = parseInt(hash.slice(0, 2), 16) % 10;
     let color;
     if (number === 0) color = 'red_violet';
     else if (number === 5) color = 'green_violet';
@@ -266,11 +274,11 @@ app.get('/api/game/status', async (req, res) => {
         const modes = Object.keys(MODES);
 
         await Promise.all(modes.map(async (mode) => {
-            const currentRound = await Round.findOne({ mode }).sort({ startTime: -1 }).lean();
+            const currentRound = await Round.findOne({ mode }).sort({ startTime: -1 }).select('period status endTime commitHash').lean();
             const last5 = await Round.find({ mode, status: 'settled' })
                 .sort({ startTime: -1 })
                 .limit(5)
-                .select('result period')
+                .select('result period commitHash seed')
                 .lean();
 
             if (currentRound) {
@@ -281,6 +289,7 @@ app.get('/api/game/status', async (req, res) => {
                     status: currentRound.status,
                     timeLeft,
                     roundId: currentRound._id,
+                    commitHash: currentRound.commitHash,
                     results: last5
                 };
             }
@@ -301,6 +310,7 @@ app.get('/api/game/history/:mode', async (req, res) => {
         const history = await Round.find({ mode, status: 'settled' })
             .sort({ startTime: -1 })
             .limit(20)
+            .select('period result commitHash seed startTime endTime')
             .lean();
         res.json(history);
     } catch (err) {
