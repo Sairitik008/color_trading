@@ -17,12 +17,11 @@ app.use(helmet({
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Database Connection
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://Sairam:Batman%400712@atlascluster.4jamwll.mongodb.net/chromex';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://Sairam:Batman%400712@atlascluster.4jamwll.mongodb.net/chromex?retryWrites=true&w=majority&appName=Cluster0';
 
 mongoose.connect(MONGODB_URI, {
     serverSelectionTimeoutMS: 5000,
     socketTimeoutMS: 45000,
-    family: 4, // Force IPv4
 })
     .then(() => {
         console.log('MongoDB Connected');
