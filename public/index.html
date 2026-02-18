@@ -1,0 +1,1452 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CHROMEX</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&family=Rajdhani:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #06071a;
+        --card: #0d0f2a;
+        --raised: #141637;
+        --green: #00e676;
+        --red: #ff1744;
+        --violet: #d500f9;
+        --gold: #ffab00;
+        --blue: #448aff;
+        --text: #e8eaf6;
+        --dim: #7986cb;
+        --muted: #3f4a8a;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Rajdhani", sans-serif;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* Layout */
+      .container {
+        max-width: 520px;
+        margin: 0 auto;
+        padding: 0 12px 80px;
+        position: relative;
+      }
+      @media (min-width: 768px) {
+        .container {
+          padding-bottom: 20px;
+        }
+      }
+
+      /* Typography */
+      .font-mono {
+        font-family: "JetBrains Mono", monospace;
+      }
+      .font-bebas {
+        font-family: "Bebas Neue", sans-serif;
+        letter-spacing: 1px;
+      }
+
+      /* Header */
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 0;
+      }
+      .logo {
+        font-size: 24px;
+        color: var(--text);
+        line-height: 1;
+      }
+      .logo span {
+        font-size: 12px;
+        color: var(--dim);
+        display: block;
+        letter-spacing: 2px;
+      }
+      .header-balance {
+        color: var(--gold);
+        font-weight: 700;
+      }
+
+      /* Wallet Card */
+      .wallet-card {
+        background: linear-gradient(135deg, var(--card), var(--raised));
+        padding: 20px;
+        border-radius: 16px;
+        margin-bottom: 20px;
+        border: 1px solid var(--muted);
+      }
+      .balance-label {
+        color: var(--dim);
+        font-size: 14px;
+        margin-bottom: 8px;
+      }
+      .balance-amount {
+        font-size: 32px;
+        margin-bottom: 16px;
+      }
+      .wallet-actions {
+        display: flex;
+        gap: 12px;
+      }
+      .btn {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.1s;
+      }
+      .btn:active {
+        transform: scale(0.98);
+      }
+      .btn-gold {
+        background: var(--gold);
+        color: #000;
+        box-shadow: 0 4px 12px rgba(255, 171, 0, 0.3);
+      }
+      .btn-dark {
+        background: var(--raised);
+        color: var(--text);
+        border: 1px solid var(--muted);
+      }
+
+      /* Game Modes */
+      .mode-tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+      .mode-tab {
+        flex: 1;
+        min-width: 80px;
+        padding: 10px;
+        text-align: center;
+        background: var(--card);
+        border-radius: 8px;
+        cursor: pointer;
+        border: 1px solid var(--muted);
+        transition: all 0.2s;
+      }
+      .mode-tab.active {
+        background: var(--gold);
+        color: #000;
+        border-color: var(--gold);
+        box-shadow: 0 0 15px rgba(255, 171, 0, 0.4);
+      }
+
+      /* Game Panel */
+      .game-panel {
+        background: linear-gradient(135deg, #ff174420, var(--card));
+        padding: 20px;
+        border-radius: 16px;
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        border: 1px solid #ff174440;
+        position: relative;
+        overflow: hidden;
+      }
+      .panel-left {
+        z-index: 1;
+      }
+      .period-id {
+        font-size: 14px;
+        color: var(--dim);
+        margin-bottom: 4px;
+      }
+      .game-title {
+        font-size: 28px;
+        margin-bottom: 12px;
+      }
+      .last-results {
+        display: flex;
+        gap: 6px;
+      }
+      .result-dot {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+        color: #fff;
+      }
+
+      .panel-right {
+        text-align: right;
+        z-index: 1;
+      }
+      .timer-label {
+        font-size: 12px;
+        color: var(--dim);
+        margin-bottom: 4px;
+      }
+      .timer-display {
+        font-size: 42px;
+        line-height: 1;
+        margin-bottom: 4px;
+      }
+      .timer-status {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--gold);
+      }
+
+      .timer-red {
+        color: var(--red);
+        animation: pulse 0.5s infinite;
+      }
+
+      /* Content Tabs */
+      .content-tabs {
+        display: flex;
+        margin-bottom: 20px;
+        border-bottom: 2px solid var(--raised);
+      }
+      .tab-btn {
+        flex: 1;
+        padding: 12px;
+        background: none;
+        border: none;
+        color: var(--dim);
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        position: relative;
+      }
+      .tab-btn.active {
+        color: var(--text);
+      }
+      .tab-btn.active::after {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: var(--gold);
+      }
+
+      /* Game Grid */
+      .game-grid {
+        display: none;
+        gap: 16px;
+        flex-direction: column;
+      }
+      .game-grid.active {
+        display: flex;
+      }
+
+      .color-row {
+        display: flex;
+        gap: 12px;
+      }
+      .btn-color {
+        flex: 1;
+        padding: 16px;
+        border-radius: 12px;
+        font-size: 16px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+      }
+      .btn-green {
+        background: var(--green);
+        box-shadow: 0 4px 15px rgba(0, 230, 118, 0.3);
+      }
+      .btn-violet {
+        background: var(--violet);
+        box-shadow: 0 4px 15px rgba(213, 0, 249, 0.3);
+      }
+      .btn-red {
+        background: var(--red);
+        box-shadow: 0 4px 15px rgba(255, 23, 68, 0.3);
+      }
+
+      .number-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+      }
+      .tile {
+        aspect-ratio: 1;
+        background: var(--raised);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: 700;
+        cursor: pointer;
+        border: 1px solid var(--muted);
+        transition: transform 0.1s;
+        position: relative;
+        overflow: hidden;
+      }
+      .tile-0 {
+        background: linear-gradient(135deg, var(--red) 50%, var(--violet) 50%);
+      }
+      .tile-5 {
+        background: linear-gradient(
+          135deg,
+          var(--green) 50%,
+          var(--violet) 50%
+        );
+      }
+      .tile:active {
+        transform: scale(0.95);
+      }
+
+      .multiplier-bar {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding: 4px 0;
+      }
+      .chip {
+        padding: 6px 12px;
+        background: var(--raised);
+        border-radius: 20px;
+        border: 1px solid var(--muted);
+        font-size: 12px;
+        white-space: nowrap;
+        cursor: pointer;
+      }
+      .chip.active {
+        background: var(--gold);
+        color: #000;
+        border-color: var(--gold);
+      }
+
+      .size-row {
+        display: flex;
+        gap: 12px;
+      }
+      .btn-big {
+        background: var(--gold);
+        color: #000;
+      }
+      .btn-small {
+        background: var(--blue);
+        color: #fff;
+      }
+
+      .disabled {
+        opacity: 0.5;
+        pointer-events: none;
+        filter: grayscale(1);
+      }
+
+      /* History & Chart */
+      .history-section {
+        display: none;
+      }
+      .history-section.active {
+        display: block;
+      }
+      .history-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+      .history-table th {
+        text-align: left;
+        padding: 12px;
+        color: var(--dim);
+        border-bottom: 1px solid var(--raised);
+      }
+      .history-table td {
+        padding: 12px;
+        border-bottom: 1px solid var(--raised);
+      }
+      .badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+      .badge-win {
+        background: rgba(0, 230, 118, 0.2);
+        color: var(--green);
+      }
+      .badge-lose {
+        background: rgba(255, 23, 68, 0.2);
+        color: var(--red);
+      }
+      .badge-pending {
+        background: rgba(255, 171, 0, 0.2);
+        color: var(--gold);
+      }
+
+      .chart-section {
+        display: none;
+        padding: 20px 0;
+      }
+      .chart-section.active {
+        display: block;
+      }
+      .stat-bar {
+        height: 8px;
+        background: var(--raised);
+        border-radius: 4px;
+        margin: 8px 0;
+        overflow: hidden;
+      }
+      .stat-fill {
+        height: 100%;
+        transition: width 0.5s;
+      }
+
+      /* Modals */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 100;
+        display: none;
+        align-items: flex-end;
+      }
+      .modal-sheet {
+        background: var(--card);
+        width: 100%;
+        border-radius: 24px 24px 0 0;
+        padding: 24px;
+        animation: slideUp 0.3s ease;
+        max-width: 520px;
+        margin: 0 auto;
+      }
+      .modal-title {
+        font-size: 20px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .modal-input {
+        width: 100%;
+        background: var(--raised);
+        border: 1px solid var(--muted);
+        padding: 16px;
+        border-radius: 12px;
+        color: #fff;
+        font-size: 18px;
+        margin-bottom: 12px;
+      }
+      .quick-amounts {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        margin-bottom: 20px;
+        padding-bottom: 4px;
+      }
+      .modal-footer {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+      }
+
+      .result-popup {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 200;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        text-align: center;
+      }
+      .result-number {
+        font-size: 120px;
+        line-height: 1;
+        margin: 20px 0;
+        transform: scale(0);
+        transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+      .confetti {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        animation: confetti 1s forwards;
+      }
+
+      /* Toasts */
+      .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 300;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        pointer-events: none;
+      }
+      .toast {
+        background: var(--card);
+        border-left: 4px solid var(--gold);
+        padding: 12px 20px;
+        border-radius: 4px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        animation: toastSlide 0.3s ease;
+        color: #fff;
+        min-width: 250px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        pointer-events: auto;
+      }
+      .toast.success {
+        border-color: var(--green);
+      }
+      .toast.error {
+        border-color: var(--red);
+      }
+
+      /* Animations */
+      @keyframes slideUp {
+        from {
+          transform: translateY(100%);
+        }
+        to {
+          transform: translateY(0);
+        }
+      }
+      @keyframes pulse {
+        0% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+      @keyframes toastSlide {
+        from {
+          transform: translateX(100%);
+        }
+        to {
+          transform: translateX(0);
+        }
+      }
+      @keyframes confetti {
+        0% {
+          transform: translate(0, 0) scale(1);
+          opacity: 1;
+        }
+        100% {
+          transform: translate(var(--tx), var(--ty)) scale(0);
+          opacity: 0;
+        }
+      }
+
+      /* Helpers */
+      .text-green {
+        color: var(--green);
+      }
+      .text-red {
+        color: var(--red);
+      }
+      .text-violet {
+        color: var(--violet);
+      }
+      .bg-green {
+        background: var(--green);
+      }
+      .bg-red {
+        background: var(--red);
+      }
+      .bg-violet {
+        background: var(--violet);
+      }
+      .bg-red-violet {
+        background: linear-gradient(135deg, var(--red) 50%, var(--violet) 50%);
+      }
+      .bg-green-violet {
+        background: linear-gradient(
+          135deg,
+          var(--green) 50%,
+          var(--violet) 50%
+        );
+      }
+
+      /* Bottom Nav */
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 60px;
+        background: var(--card);
+        border-top: 1px solid var(--muted);
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        z-index: 90;
+      }
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: 10px;
+        color: var(--dim);
+        gap: 4px;
+        cursor: pointer;
+      }
+      .nav-item.active {
+        color: var(--gold);
+      }
+      .nav-icon {
+        font-size: 20px;
+      }
+      @media (min-width: 768px) {
+        .bottom-nav {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <header>
+        <div class="logo font-bebas">🎨 CHROMEX</div>
+        <div class="header-balance font-mono">
+          ₹<span id="headerBalance">1,000.00</span>
+        </div>
+      </header>
+
+      <!-- Wallet Card -->
+      <div class="wallet-card">
+        <div class="balance-label">REVIEW BALANCE</div>
+        <div class="balance-amount font-mono">
+          ₹<span id="mainBalance">1,000.00</span>
+        </div>
+        <div class="wallet-actions">
+          <button class="btn btn-gold" onclick="openDepositModal()">
+            DEPOSIT +20%
+          </button>
+          <button class="btn btn-dark" onclick="openWithdrawModal()">
+            WITHDRAW
+          </button>
+        </div>
+      </div>
+      <!-- Game Modes -->
+      <div class="mode-tabs" id="modeTabs">
+        <div class="mode-tab active" onclick="switchMode('30s')">⚡ 30S</div>
+        <div class="mode-tab" onclick="switchMode('1min')">🕐 1MIN</div>
+        <div class="mode-tab" onclick="switchMode('3min')">🕐 3MIN</div>
+        <div class="mode-tab" onclick="switchMode('5min')">🕐 5MIN</div>
+      </div>
+
+      <!-- Game Panel -->
+      <div class="game-panel">
+        <div class="panel-left">
+          <div class="period-id font-mono" id="currentPeriod">Loading...</div>
+          <div class="game-title font-bebas">WIN GO</div>
+          <div class="last-results" id="lastResults">
+            <!-- Dots injected by JS -->
+          </div>
+        </div>
+        <div class="panel-right">
+          <div class="timer-label">Time Remaining</div>
+          <div class="timer-display font-bebas" id="timerDisplay">00:00</div>
+          <div class="timer-status" id="timerStatus">Wait...</div>
+        </div>
+      </div>
+
+      <!-- Content Tabs -->
+      <div class="content-tabs">
+        <button class="tab-btn active" onclick="switchContentTab('game')">
+          Game
+        </button>
+        <button class="tab-btn" onclick="switchContentTab('chart')">
+          Chart
+        </button>
+        <button class="tab-btn" onclick="switchContentTab('history')">
+          History
+        </button>
+      </div>
+
+      <!-- GAME TAB -->
+      <div id="tab-game" class="game-grid active">
+        <!-- Row 1: Colors -->
+        <div class="color-row">
+          <button
+            class="btn-color btn-green"
+            onclick="openBetModal('color', 'green')"
+          >
+            Join Green
+          </button>
+          <button
+            class="btn-color btn-violet"
+            onclick="openBetModal('color', 'violet')"
+          >
+            Join Violet
+          </button>
+          <button
+            class="btn-color btn-red"
+            onclick="openBetModal('color', 'red')"
+          >
+            Join Red
+          </button>
+        </div>
+
+        <!-- Row 2: Numbers -->
+        <div class="number-grid">
+          <div class="tile tile-0" onclick="openBetModal('number', '0')">0</div>
+          <div class="tile" onclick="openBetModal('number', '1')">1</div>
+          <div class="tile" onclick="openBetModal('number', '2')">2</div>
+          <div class="tile" onclick="openBetModal('number', '3')">3</div>
+          <div class="tile" onclick="openBetModal('number', '4')">4</div>
+          <div class="tile tile-5" onclick="openBetModal('number', '5')">5</div>
+          <div class="tile" onclick="openBetModal('number', '6')">6</div>
+          <div class="tile" onclick="openBetModal('number', '7')">7</div>
+          <div class="tile" onclick="openBetModal('number', '8')">8</div>
+          <div class="tile" onclick="openBetModal('number', '9')">9</div>
+        </div>
+
+        <!-- Row 3: Multiplier -->
+        <div class="multiplier-bar">
+          <div class="chip" onclick="randomBet()">RANDOM</div>
+          <div class="chip active" onclick="setMultiplier(1)">x1</div>
+          <div class="chip" onclick="setMultiplier(5)">x5</div>
+          <div class="chip" onclick="setMultiplier(10)">x10</div>
+          <div class="chip" onclick="setMultiplier(20)">x20</div>
+          <div class="chip" onclick="setMultiplier(50)">x50</div>
+          <div class="chip" onclick="setMultiplier(100)">x100</div>
+        </div>
+
+        <!-- Row 4: Size -->
+        <div class="size-row">
+          <button
+            class="btn btn-color btn-big"
+            onclick="openBetModal('size', 'big')"
+          >
+            BIG
+          </button>
+          <button
+            class="btn btn-color btn-small"
+            onclick="openBetModal('size', 'small')"
+          >
+            SMALL
+          </button>
+        </div>
+      </div>
+
+      <!-- CHART TAB -->
+      <div id="tab-chart" class="chart-section">
+        <h3>Frequency (Last 100)</h3>
+        <div id="chartStats">Loading...</div>
+      </div>
+
+      <!-- HISTORY TAB -->
+      <div id="tab-history" class="history-section">
+        <div class="content-tabs" style="border: none; margin-bottom: 10px">
+          <button
+            class="tab-btn active"
+            style="font-size: 14px"
+            onclick="switchHistoryTab('global')"
+          >
+            Game History
+          </button>
+          <button
+            class="tab-btn"
+            style="font-size: 14px"
+            onclick="switchHistoryTab('my')"
+          >
+            My Bets
+          </button>
+        </div>
+
+        <div id="hist-global">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Period</th>
+                <th>Number</th>
+                <th>Size</th>
+                <th>Color</th>
+              </tr>
+            </thead>
+            <tbody id="globalHistoryBody"></tbody>
+          </table>
+        </div>
+
+        <div id="hist-my" style="display: none">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Period</th>
+                <th>Bet</th>
+                <th>Amount</th>
+                <th>Result</th>
+              </tr>
+            </thead>
+            <tbody id="myHistoryBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <!-- Modals -->
+    <div
+      class="modal-overlay"
+      id="betModal"
+      onclick="if (event.target === this) closeBetModal();"
+    >
+      <div class="modal-sheet">
+        <div class="modal-title">Join <span id="betTarget">GREEN</span></div>
+        <div class="balance-label">
+          Balance: ₹<span id="modalBalance">1000.00</span>
+        </div>
+        <input
+          type="number"
+          class="modal-input"
+          id="betAmount"
+          value="10"
+          min="10"
+          placeholder="Min ₹10"
+        />
+        <div class="quick-amounts">
+          <div class="chip" onclick="addToBet(10)">+10</div>
+          <div class="chip" onclick="addToBet(50)">+50</div>
+          <div class="chip" onclick="addToBet(100)">+100</div>
+          <div class="chip" onclick="addToBet(500)">+500</div>
+          <div class="chip" onclick="addToBet(1000)">+1K</div>
+        </div>
+        <div class="multiplier-bar" id="modalMultipliers">
+          <div class="chip active" onclick="setModalMultiplier(1)">x1</div>
+          <div class="chip" onclick="setModalMultiplier(5)">x5</div>
+          <div class="chip" onclick="setModalMultiplier(10)">x10</div>
+          <div class="chip" onclick="setModalMultiplier(20)">x20</div>
+          <div class="chip" onclick="setModalMultiplier(50)">x50</div>
+          <div class="chip" onclick="setModalMultiplier(100)">x100</div>
+        </div>
+        <div
+          style="
+            margin-top: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <div id="totalBetLabel">Total: ₹10</div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-dark" onclick="closeBetModal()">CANCEL</button>
+          <button class="btn btn-gold" onclick="confirmBet()">
+            CONFIRM BET
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal-overlay"
+      id="depositModal"
+      onclick="if (event.target === this) closeDepositModal();"
+    >
+      <div class="modal-sheet">
+        <div class="modal-title">Add Funds 🎁</div>
+        <p style="color: var(--dim); margin-bottom: 12px">
+          First deposit gets 20% bonus!
+        </p>
+        <input
+          type="number"
+          class="modal-input"
+          id="depositAmount"
+          placeholder="Amount"
+        />
+        <div class="quick-amounts">
+          <div
+            class="chip"
+            onclick="document.getElementById('depositAmount').value = 100"
+          >
+            +100
+          </div>
+          <div
+            class="chip"
+            onclick="document.getElementById('depositAmount').value = 500"
+          >
+            +500
+          </div>
+          <div
+            class="chip"
+            onclick="document.getElementById('depositAmount').value = 1000"
+          >
+            +1K
+          </div>
+        </div>
+        <div
+          style="
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: center;
+          "
+        >
+          <div
+            style="
+              width: 150px;
+              height: 150px;
+              background: #000;
+              margin: 0 auto 10px;
+              display: grid;
+              place-items: center;
+              color: #fff;
+            "
+          >
+            [QR CODE]
+          </div>
+          <div style="color: #000; font-weight: 700">UPI: chromex@gravity</div>
+        </div>
+        <button
+          class="btn btn-gold"
+          style="width: 100%"
+          onclick="processDeposit()"
+        >
+          ADD FUNDS
+        </button>
+      </div>
+    </div>
+
+    <!-- Result Popup -->
+    <div class="result-popup" id="resultPopup">
+      <div
+        style="font-size: 16px; color: var(--dim); margin-bottom: 20px"
+        id="resPeriod"
+      >
+        Period: 20231212001
+      </div>
+      <div class="result-number font-bebas" id="resNumber">5</div>
+      <div style="display: flex; gap: 12px; margin-bottom: 30px">
+        <span class="badge" id="resColorBadge">GREEN</span>
+        <span class="badge" id="resSizeBadge">BIG</span>
+      </div>
+      <div id="resWinLose" style="margin-bottom: 20px">
+        <!-- Injected -->
+      </div>
+      <div style="color: var(--dim); font-size: 12px">
+        Next round starting...
+      </div>
+    </div>
+
+    <!-- Toasts -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+      // State
+      let balance = 1000;
+      let currentMode = "30s";
+      let statusData = {};
+      let myBets = [];
+      let currentBet = null; // { type, value, multiplier }
+      let modalMultiplier = 1;
+      let isFirstDeposit = true;
+      let lastPeriod = null;
+      let userBetsForCurrentRound = []; // Track if user bet on current round
+
+      // Init
+      document.addEventListener("DOMContentLoaded", () => {
+        updateBalanceUI();
+        startPolling();
+        switchMode("30s");
+      });
+
+      // Polling
+      function startPolling() {
+        setInterval(fetchStatus, 1000);
+        fetchStatus(); // Initial
+      }
+
+      async function fetchStatus() {
+        try {
+          const res = await fetch("/api/game/status");
+          const data = await res.json();
+          statusData = data;
+          updateGameUI();
+          checkResult();
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      // UI Updates
+      function updateGameUI() {
+        const modeData = statusData[currentMode];
+        if (!modeData) return;
+
+        // Timer
+        const timerEl = document.getElementById("timerDisplay");
+        const statusEl = document.getElementById("timerStatus");
+        const min = Math.floor(modeData.timeLeft / 60);
+        const sec = modeData.timeLeft % 60;
+        timerEl.textContent = `${min}:${sec.toString().padStart(2, "0")}`;
+
+        if (modeData.timeLeft <= 5 && modeData.status === "open") {
+          timerEl.classList.add("timer-red");
+          statusEl.textContent = "Closing...";
+          disableBetting(true);
+        } else if (modeData.status === "locked") {
+          statusEl.textContent = "Locked";
+          disableBetting(true);
+        } else {
+          timerEl.classList.remove("timer-red");
+          statusEl.textContent = "Place Bets!";
+          disableBetting(false);
+        }
+
+        // Period
+        document.getElementById("currentPeriod").textContent = modeData.period;
+
+        // Last Results
+        const resultsContainer = document.getElementById("lastResults");
+        resultsContainer.innerHTML = "";
+        modeData.results.forEach((r) => {
+          const dot = document.createElement("div");
+          dot.className = `result-dot bg-${getColorClass(r.result.number)}`;
+          dot.textContent = r.result.number;
+          resultsContainer.appendChild(dot);
+        });
+
+        // History Tab Update (Optimized: only if tab active)
+        if (document.getElementById("tab-history").style.display !== "none") {
+          fetchHistory();
+        }
+      }
+
+      function disableBetting(disabled) {
+        const grid = document.querySelector(".game-grid");
+        if (disabled) grid.classList.add("disabled");
+        else grid.classList.remove("disabled");
+      }
+
+      // Result Logic
+      function checkResult() {
+        const modeData = statusData[currentMode];
+        if (!modeData) return;
+
+        // If period changed, means new round started
+        if (lastPeriod && lastPeriod !== modeData.period) {
+          // Round changed.
+          // Wait, if round just changed to OPEN, previous one just settled.
+          // We should show result for the PREVIOUS period.
+          // But we don't have the previous period data here easily unless we fetch history.
+          // However, the `results` array has the latest results.
+          // The newest result [0] is the one that just finished.
+          const lastResult = modeData.results[0];
+          if (lastResult) {
+            showResultPopup(lastResult);
+          }
+          userBetsForCurrentRound = []; // Reset for new round
+        }
+        lastPeriod = modeData.period;
+      }
+
+      function showResultPopup(result) {
+        // Check if user bet on this round
+        // We need to track bets by period.
+        // Since we don't have persistent user ID, we check `myBets` array in memory.
+        const period = result.period;
+        const betsOnThisRound = myBets.filter((b) => b.period === period);
+
+        let totalPayout = 0;
+        let didWin = false;
+
+        if (betsOnThisRound.length > 0) {
+          // Calculate winnings locally (or fetch from server if we had ID)
+          // We rely on local calculation for the popup animation
+          // But server handles real balance logic if we had auth.
+          // Since balance is client-side only here, we update it here.
+
+          // Oops, the prompt says "No auth... Balance starts at 1000 in JS memory".
+          // So I MUST calculate winnings here!
+
+          const num = result.result.number;
+          const col = result.result.color; // server returns this
+          const siz = result.result.size;
+
+          betsOnThisRound.forEach((bet) => {
+            let multiplier = 0;
+            // Logic duplication from server for client display/balance update
+            if (bet.type === "color") {
+              if (
+                bet.value === "green" &&
+                (col === "green" || col === "green_violet")
+              )
+                multiplier = 2;
+              if (
+                bet.value === "red" &&
+                (col === "red" || col === "red_violet")
+              )
+                multiplier = 2;
+              if (
+                bet.value === "violet" &&
+                (col === "red_violet" || col === "green_violet")
+              )
+                multiplier = 4.5;
+            } else if (bet.type === "number") {
+              if (parseInt(bet.value) === num)
+                multiplier = num === 0 || num === 5 ? 4.5 : 9;
+            } else if (bet.type === "size") {
+              if (bet.value === siz) multiplier = 2;
+            }
+
+            if (multiplier > 0) {
+              const winAmount = bet.amount * bet.multiplier * multiplier; // bet.amount is unit, bet.multiplier is x1/x5
+              // Wait, bet.amount is total bet? No.
+              // In my modal: `totalAmount = amount * multiplier`.
+              // So `payout = totalAmount * game_multiplier`.
+              const totalBet = bet.amount * bet.multiplier;
+              const payout = totalBet * multiplier;
+              totalPayout += payout;
+              didWin = true;
+              bet.result = "win";
+              bet.payout = payout;
+            } else {
+              bet.result = "lose";
+            }
+          });
+
+          if (didWin) {
+            balance += totalPayout;
+            updateBalanceUI();
+          }
+        }
+
+        // Show Popup
+        const popup = document.getElementById("resultPopup");
+        document.getElementById("resPeriod").textContent = `Period: ${period}`;
+        const numEl = document.getElementById("resNumber");
+        numEl.textContent = result.result.number;
+        numEl.style.color =
+          result.result.number === 0
+            ? "#d500f9"
+            : result.result.number === 5
+              ? "#d500f9"
+              : [1, 3, 7, 9].includes(result.result.number)
+                ? "#00e676"
+                : "#ff1744";
+
+        document.getElementById("resColorBadge").textContent =
+          result.result.color.toUpperCase().replace("_", "/");
+        document.getElementById("resSizeBadge").textContent =
+          result.result.size.toUpperCase();
+
+        const winLoseEl = document.getElementById("resWinLose");
+        if (betsOnThisRound.length > 0) {
+          if (didWin) {
+            winLoseEl.innerHTML = `
+                        <div style="font-size:24px; font-weight:700; color:var(--green)">🎉 YOU WIN</div>
+                        <div style="font-size:32px; color:var(--gold); text-shadow:0 0 10px rgba(255,171,0,0.5)">+₹${totalPayout.toFixed(2)}</div>
+                    `;
+            // Confetti
+            for (let i = 0; i < 5; i++) {
+              const c = document.createElement("div");
+              c.className = "confetti";
+              c.style.backgroundColor = [
+                "#f00",
+                "#0f0",
+                "#00f",
+                "#ff0",
+                "#f0f",
+              ][i];
+              c.style.left = "50%";
+              c.style.top = "50%";
+              c.style.setProperty("--tx", Math.random() * 200 - 100 + "px");
+              c.style.setProperty("--ty", Math.random() * 200 - 100 + "px");
+              popup.appendChild(c);
+            }
+          } else {
+            winLoseEl.innerHTML = `<div style="font-size:18px; color:var(--red)">😞 Better Luck Next Time</div>`;
+          }
+        } else {
+          winLoseEl.innerHTML = "";
+        }
+
+        popup.style.display = "flex";
+        setTimeout(() => {
+          popup.style.display = "none";
+          popup.querySelectorAll(".confetti").forEach((e) => e.remove());
+        }, 3000);
+      }
+
+      // Helpers
+      function getColorClass(n) {
+        if (n === 0) return "red-violet";
+        if (n === 5) return "green-violet";
+        if ([1, 3, 7, 9].includes(n)) return "green";
+        return "red";
+      }
+
+      // Actions
+      function switchMode(mode) {
+        currentMode = mode;
+        document.querySelectorAll(".mode-tab").forEach((t) => {
+          t.classList.toggle(
+            "active",
+            t.innerText.includes(mode.toUpperCase()),
+          );
+        });
+        fetchStatus();
+      }
+
+      function switchContentTab(tab) {
+        document.querySelectorAll(".content-tabs .tab-btn").forEach((b) => {
+          b.classList.toggle("active", b.innerText.toLowerCase() === tab);
+        });
+        document
+          .getElementById("tab-game")
+          .classList.toggle("active", tab === "game");
+        document
+          .getElementById("tab-chart")
+          .classList.toggle("active", tab === "chart");
+        document
+          .getElementById("tab-history")
+          .classList.toggle("active", tab === "history");
+
+        if (tab === "history") fetchHistory();
+      }
+
+      function switchHistoryTab(sub) {
+        document.getElementById("hist-global").style.display =
+          sub === "global" ? "block" : "none";
+        document.getElementById("hist-my").style.display =
+          sub === "my" ? "block" : "none";
+        document
+          .querySelectorAll("#tab-history .tab-btn")
+          .forEach((b) => b.classList.remove("active"));
+        event.target.classList.add("active");
+      }
+
+      async function fetchHistory() {
+        const res = await fetch(`/api/game/history/${currentMode}`);
+        const data = await res.json();
+        const tbody = document.getElementById("globalHistoryBody");
+        tbody.innerHTML = data
+          .map(
+            (r) => `
+                <tr>
+                    <td>${r.period.slice(-4)}</td>
+                    <td><div class="result-dot bg-${getColorClass(r.result.number)}" style="width:20px;height:20px">${r.result.number}</div></td>
+                    <td>${r.result.size === "big" ? "BIG" : "SMALL"}</td>
+                    <td><span class="badge" style="background:${r.result.color.includes("green") ? "#00e67620" : "#ff174420"}">${r.result.color.split("_")[0]}</span></td>
+                </tr>
+            `,
+          )
+          .join("");
+
+        updateMyHistory();
+      }
+
+      function updateMyHistory() {
+        const tbody = document.getElementById("myHistoryBody");
+        tbody.innerHTML = myBets
+          .slice()
+          .reverse()
+          .map(
+            (b) => `
+                <tr>
+                    <td>${b.period.slice(-4)}</td>
+                    <td>${b.value.toUpperCase()}</td>
+                    <td>₹${b.amount * b.multiplier}</td>
+                    <td>${b.result === "win" ? '<span class="badge badge-win">WIN</span>' : b.result === "lose" ? '<span class="badge badge-lose">LOSE</span>' : '<span class="badge badge-pending">PENDING</span>'}</td>
+                </tr>
+            `,
+          )
+          .join("");
+      }
+
+      // Betting
+      function openBetModal(type, value) {
+        if (
+          document.querySelector(".game-grid").classList.contains("disabled")
+        ) {
+          showToast("Round is locked!", "error");
+          return;
+        }
+        currentBet = { type, value };
+        document.getElementById("betTarget").textContent = value.toUpperCase();
+        document.getElementById("betModal").style.display = "flex";
+        updateModalTotal();
+      }
+
+      function closeBetModal() {
+        document.getElementById("betModal").style.display = "none";
+      }
+
+      function setModalMultiplier(m) {
+        modalMultiplier = m;
+        document
+          .querySelectorAll("#modalMultipliers .chip")
+          .forEach((c) => c.classList.remove("active"));
+        event.target.classList.add("active");
+        updateModalTotal();
+      }
+
+      function addToBet(amt) {
+        const input = document.getElementById("betAmount");
+        input.value = parseInt(input.value || 0) + amt;
+        updateModalTotal();
+      }
+
+      document
+        .getElementById("betAmount")
+        .addEventListener("input", updateModalTotal);
+
+      function updateModalTotal() {
+        const amt = parseInt(document.getElementById("betAmount").value) || 0;
+        const total = amt * modalMultiplier;
+        const el = document.getElementById("totalBetLabel");
+        el.textContent = `Total: ₹${total}`;
+        el.style.color = total > balance ? "var(--red)" : "var(--text)";
+      }
+
+      async function confirmBet() {
+        const amount = parseInt(document.getElementById("betAmount").value);
+        if (!amount || amount < 10) {
+          showToast("Minimum bet is ₹10", "error");
+          return;
+        }
+        const total = amount * modalMultiplier;
+        if (total > balance) {
+          showToast("Insufficient Balance", "error");
+          return;
+        }
+
+        // Send to server
+        try {
+          const res = await fetch("/api/game/bet", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              mode: currentMode,
+              betType: currentBet.type,
+              betValue: currentBet.value,
+              amount: amount,
+              multiplier: modalMultiplier,
+            }),
+          });
+          const data = await res.json();
+          if (data.error) {
+            showToast(data.error, "error");
+          } else {
+            balance -= total;
+            updateBalanceUI();
+            myBets.push({
+              period: statusData[currentMode].period,
+              type: currentBet.type,
+              value: currentBet.value,
+              amount: amount,
+              multiplier: modalMultiplier,
+              result: "pending",
+            });
+            showToast("Bet Placed Successfully!", "success");
+            closeBetModal();
+          }
+        } catch (err) {
+          showToast("Network Error", "error");
+        }
+      }
+
+      function randomBet() {
+        const types = ["color", "number", "size"];
+        const t = types[Math.floor(Math.random() * 3)];
+        let v;
+        if (t === "color")
+          v = ["green", "red", "violet"][Math.floor(Math.random() * 3)];
+        if (t === "number") v = Math.floor(Math.random() * 10).toString();
+        if (t === "size") v = ["big", "small"][Math.floor(Math.random() * 2)];
+        openBetModal(t, v);
+      }
+
+      // Wallet
+      function updateBalanceUI() {
+        document.getElementById("headerBalance").textContent =
+          balance.toFixed(2);
+        document.getElementById("mainBalance").textContent = balance.toFixed(2);
+        document.getElementById("modalBalance").textContent =
+          balance.toFixed(2);
+      }
+
+      function openDepositModal() {
+        document.getElementById("depositModal").style.display = "flex";
+      }
+      function closeDepositModal() {
+        document.getElementById("depositModal").style.display = "none";
+      }
+
+      function processDeposit() {
+        let amt = parseInt(document.getElementById("depositAmount").value);
+        if (!amt) return;
+        if (isFirstDeposit) {
+          amt = amt * 1.2;
+          isFirstDeposit = false;
+          showToast(`First Deposit Bonus! Added ₹${amt}`, "success");
+        } else {
+          showToast(`Added ₹${amt}`, "success");
+        }
+        balance += amt;
+        updateBalanceUI();
+        closeDepositModal();
+      }
+
+      function openWithdrawModal() {
+        showToast("Withdrawal initiated", "info");
+      }
+
+      // Toasts
+      function showToast(msg, type) {
+        const t = document.createElement("div");
+        t.className = `toast ${type}`;
+        t.innerHTML =
+          type === "success"
+            ? "✓ " + msg
+            : type === "error"
+              ? "✗ " + msg
+              : "ℹ " + msg;
+        document.getElementById("toastContainer").appendChild(t);
+        setTimeout(() => {
+          t.style.opacity = "0";
+          t.style.transform = "translateX(100%)";
+          setTimeout(() => t.remove(), 300);
+        }, 3000);
+      }
+    </script>
+  </body>
+</html>

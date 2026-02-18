@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: chromex-trading
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false # You must provide this manually in Render Dashboard
