@@ -17,18 +17,21 @@ app.use(helmet({
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Database Connection
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://atlascluster.4jamwll.mongodb.net/chromex?retryWrites=true&w=majority&appName=Cluster0';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/chromex';
 
-// Fallback credentials if not in URI
-const DB_USER = 'Sairam';
-const DB_PASS = 'Batman@0712'; // Special char is handled by mongoose options
+const DB_USER = process.env.DB_USER;
+const DB_PASS = process.env.DB_PASS;
 
-mongoose.connect(MONGODB_URI, {
-    user: DB_USER,
-    pass: DB_PASS,
+const connOptions = {
     serverSelectionTimeoutMS: 5000,
     socketTimeoutMS: 45000,
-})
+};
+if (DB_USER && DB_PASS) {
+    connOptions.user = DB_USER;
+    connOptions.pass = DB_PASS;
+}
+
+mongoose.connect(MONGODB_URI, connOptions)
     .then(() => {
         console.log('MongoDB Connected');
         startGameLoop();
