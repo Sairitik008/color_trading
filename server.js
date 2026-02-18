@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const path = require('path');
+const { randomInt } = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -171,11 +172,7 @@ async function createNewRound(mode) {
 }
 
 async function settleRound(round) {
-    // Generate Result
-    // 0 = Red/Violet, 5 = Green/Violet
-    // 1,3,7,9 = Green
-    // 2,4,6,8 = Red
-    const number = Math.floor(Math.random() * 10);
+    const number = randomInt(0, 10);
     let color;
     if (number === 0) color = 'red_violet';
     else if (number === 5) color = 'green_violet';
