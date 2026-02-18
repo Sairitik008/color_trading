@@ -22,6 +22,7 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://Sairam:Batman%4007
 mongoose.connect(MONGODB_URI, {
     serverSelectionTimeoutMS: 5000,
     socketTimeoutMS: 45000,
+    family: 4, // Force IPv4
 })
     .then(() => {
         console.log('MongoDB Connected');
